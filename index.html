@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Asia Index Board</title>
+<meta name="description" content="Today's movement for seven Asian equity indices.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b1118'/%3E%3Cpath d='M5 22l7-7 5 4 10-10' fill='none' stroke='%233fd492' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --ink:#0b1118; --panel:#111a24; --panel-2:#162230; --line:#223142;
+  --fg:#e7edf3; --muted:#8796a8; --faint:#5a6a7d; --accent:#9db4ff; --accent-ink:#0b1118;
+  --open:#3fd492; --closed:#4f5e70; --up:#3fd492; --down:#ff7d93; --soon:#ffb547;
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ink);color:var(--fg);font-family:var(--f-body);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1440px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:18px}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* top bar */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px 28px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.brand{display:grid;gap:2px;min-width:0}
+.brand h1{margin:0;font-family:var(--f-display);font-stretch:118%;font-weight:700;font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.brand .date{font-family:var(--f-display);font-size:22px;font-weight:600;font-stretch:105%}
+.clock{display:flex;align-items:baseline;gap:8px;font-family:var(--f-display);font-stretch:112%;font-variant-numeric:tabular-nums;line-height:1}
+.clock .hms{font-size:clamp(34px,5vw,52px);font-weight:600}
+.clock .sec{color:var(--muted)}
+.clock .ampm{font-size:clamp(15px,1.8vw,20px);font-weight:700;color:var(--accent);letter-spacing:.06em}
+.clock .tz{font-family:var(--f-body);font-size:12px;color:var(--faint);letter-spacing:.08em;align-self:flex-start;margin-top:4px}
+.stat{display:grid;justify-items:end;gap:6px;font-size:12px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600}
+.btn:hover{filter:brightness(1.08)}
+.btn[disabled]{opacity:.6;cursor:default}
+.btn svg{width:15px;height:15px}
+.spin{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* breadth strip */
+.breadth{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:13px;color:var(--muted)}
+.breadth b{font-family:var(--f-mono);font-weight:600}
+
+/* tiles */
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.tile{--c:var(--closed);--dir:var(--muted);position:relative;overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 14px 12px;display:grid;gap:10px;min-width:0;transition:background-color .4s,border-color .4s}
+.tile::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--c)}
+.tile.open{--c:var(--open);background:color-mix(in srgb,var(--open) 10%,var(--panel));border-color:color-mix(in srgb,var(--open) 40%,var(--line))}
+.tile.up{--dir:var(--up)} .tile.down{--dir:var(--down)}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;min-width:0}
+.nm{display:grid;gap:1px;min-width:0}
+.code{font-family:var(--f-display);font-stretch:115%;font-weight:700;font-size:19px;letter-spacing:.03em;white-space:nowrap}
+.full{font-size:11px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--c);white-space:nowrap}
+.tile:not(.open) .pill{color:var(--muted)}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 22%,transparent)}
+.tile.open .pill::before{animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--c) 0%,transparent)}}
+.px{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.val{font-family:var(--f-display);font-stretch:106%;font-variant-numeric:tabular-nums;font-size:34px;font-weight:650;line-height:1.05;letter-spacing:-.01em;user-select:all;cursor:copy;border-radius:4px}
+.val.copied{color:var(--open)}
+.chg{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:14px;font-weight:600;color:var(--dir);white-space:nowrap}
+.chg .pct{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:5px;background:color-mix(in srgb,var(--dir) 15%,transparent)}
+.chart{width:100%;height:84px;display:block;overflow:visible}
+.axis{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:10px;color:var(--faint);margin-top:-4px}
+.meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--line) 80%,transparent);font-size:11px;color:var(--faint)}
+.meta span{display:grid;gap:1px;min-width:0}
+.meta b{font-family:var(--f-mono);font-weight:500;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.err{color:var(--soon);font-size:13px;padding:24px 0;text-align:center}
+.skel{height:220px;border-radius:var(--r);background:linear-gradient(90deg,var(--panel),var(--panel-2),var(--panel));background-size:200% 100%;animation:sh 1.4s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+
+/* summary tile (8th cell) */
+.sum{background:transparent;border:1px dashed var(--line);border-radius:var(--r);padding:14px;display:grid;align-content:start;gap:10px;font-size:13px;color:var(--muted)}
+.sum h2{margin:0;font-family:var(--f-display);font-stretch:108%;font-size:15px;font-weight:650;color:var(--fg)}
+.rank{display:grid;gap:6px}
+.rank div{display:grid;grid-template-columns:52px minmax(0,1fr) 62px;align-items:center;gap:8px}
+.rank .k{font-family:var(--f-display);font-stretch:112%;font-weight:700;font-size:12px;letter-spacing:.04em;color:var(--fg)}
+.rank .bar{height:6px;border-radius:3px;background:var(--panel-2);position:relative}
+.rank .bar i{position:absolute;top:0;bottom:0;border-radius:3px}
+.rank .bar::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--faint)}
+.rank .p{font-family:var(--f-mono);font-size:12px;text-align:right;font-variant-numeric:tabular-nums}
+.foot{font-size:11px;color:var(--faint);line-height:1.6}
+.up-t{color:var(--up)} .down-t{color:var(--down)}
+
+@media (max-width:1180px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.grid{grid-template-columns:minmax(0,1fr)}.top{align-items:flex-start}.stat{justify-items:start}.val{font-size:30px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Asia Index Board</h1>
+      <div class="date" id="date">—</div>
+    </div>
+    <div class="clock" aria-label="Singapore time">
+      <span class="hms" id="hms">--:--<span class="sec">:--</span></span>
+      <span class="ampm" id="ampm">--</span>
+      <span class="tz">SGT</span>
+    </div>
+    <div class="stat">
+      <button class="btn" id="refresh" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+        <span>Refresh</span>
+      </button>
+      <span id="age">Loading…</span>
+    </div>
+  </header>
+
+  <div class="breadth" id="breadth"></div>
+  <section class="grid" id="grid" aria-label="Index tiles"></section>
+  <p class="foot">Prices from Yahoo Finance, usually delayed about 15 minutes. Change is against the previous close. Click a level to copy it. The page refreshes every minute. Times shown in Singapore time.</p>
+</div>
+
+<script>
+const INDICES = [
+  {sym:"^STI",    code:"STI",    full:"Straits Times Index",          mkt:"Singapore"},
+  {sym:"^HSI",    code:"HSI",    full:"Hang Seng Index",              mkt:"Hong Kong"},
+  {sym:"^SET.BK", code:"SET",    full:"SET Index",                    mkt:"Thailand"},
+  {sym:"^JKSE",   code:"JCI",    full:"Jakarta Composite Index",      mkt:"Indonesia"},
+  {sym:"^N225",   code:"N225",   full:"Nikkei 225",                   mkt:"Japan"},
+  {sym:"^KS11",   code:"KOSPI",  full:"KOSPI Composite",              mkt:"Korea"},
+  {sym:"^KLSE",   code:"KLCI",   full:"FTSE Bursa Malaysia KLCI",     mkt:"Malaysia"},
+];
+const SGT = 8, pad = n => String(n).padStart(2,"0");
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"], DOWL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const sgt = ms => new Date(ms + SGT*3600e3);
+function t12(sec, short){ const d = sgt(sec*1000); let h = d.getUTCHours(); const ap = h>=12?"pm":"am"; h = h%12||12; const m = d.getUTCMinutes(); return short && !m ? h+ap : h+":"+pad(m)+(short?ap:" "+ap.toUpperCase()); }
+const fmt = (v, dp=2) => v==null||isNaN(v) ? "—" : v.toLocaleString("en-US",{minimumFractionDigits:dp,maximumFractionDigits:dp});
+const sign = v => v>0 ? "+" : v<0 ? "−" : "";
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function tick(){
+  const d = sgt(Date.now()); let h = d.getUTCHours(); const ap = h>=12?"PM":"AM"; h = h%12||12;
+  document.getElementById("hms").innerHTML = pad(h)+":"+pad(d.getUTCMinutes())+'<span class="sec">:'+pad(d.getUTCSeconds())+"</span>";
+  document.getElementById("ampm").textContent = ap;
+  document.getElementById("date").textContent = DOWL[d.getUTCDay()]+" "+d.getUTCDate()+" "+MON[d.getUTCMonth()]+" "+d.getUTCFullYear();
+  if (lastFetch) document.getElementById("age").textContent = "Updated "+t12(lastFetch/1000)+" · next in "+Math.max(0,Math.ceil((lastFetch+60e3-Date.now())/1000))+"s";
+}
+
+function chart(x){
+  const W = 300, H = 84, P = 3, pts = x.points || [];
+  if (pts.length < 2) return `<svg class="chart" viewBox="0 0 ${W} ${H}"></svg>`;
+  // After midnight in Tokyo/Seoul, Yahoo's trading period is already the next session: shift it back to the data's day.
+  while (x.open && x.open > pts[0][0] + 3600){ x.open -= 86400; x.close -= 86400; }
+  const t0 = x.open || pts[0][0], t1 =Math.max(x.close || pts[pts.length-1][0], pts[pts.length-1][0]);
+  const vals = pts.map(p=>p[1]).concat(x.prev!=null?[x.prev]:[]);
+  let lo = Math.min(...vals), hi = Math.max(...vals); const pad_ = (hi-lo)*.08 || 1; lo -= pad_; hi += pad_;
+  const X = t => P + (t-t0)/(t1-t0)*(W-2*P), Y = v => P + (hi-v)/(hi-lo)*(H-2*P);
+  const line = pts.map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join("");
+  const last = pts[pts.length-1], id = "g"+x.sym.replace(/\W/g,"");
+  const area = line+`L${X(last[0]).toFixed(1)} ${H}L${X(pts[0][0]).toFixed(1)} ${H}Z`;
+  const py = x.prev!=null ? Y(x.prev).toFixed(1) : null;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Intraday chart">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--dir)" stop-opacity=".28"/><stop offset="1" stop-color="var(--dir)" stop-opacity="0"/></linearGradient></defs>
+    <path d="${area}" fill="url(#${id})"/>
+    ${py!=null?`<line x1="0" x2="${W}" y1="${py}" y2="${py}" stroke="var(--faint)" stroke-width="1" stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>`:""}
+    <path d="${line}" fill="none" stroke="var(--dir)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+    <circle cx="${X(last[0]).toFixed(1)}" cy="${Y(last[1]).toFixed(1)}" r="3" fill="var(--dir)"/>
+  </svg>`;
+}
+
+function tile(meta, x){
+  if (!x || x.error || x.price==null) return `<article class="tile"><div class="hd"><div class="nm"><span class="code">${meta.code}</span><span class="full">${meta.mkt} · ${meta.full}</span></div></div><div class="err">No data right now. It will retry in a minute.</div></article>`;
+  const chg = x.price - x.prev, pct = chg / x.prev * 100;
+  const now = Date.now()/1000, open = x.open && x.close && now >= x.open && now < x.close && (now - x.time) < 1800;
+  const dir = chg>0 ? "up" : chg<0 ? "down" : "";
+  const status = open ? "Open" : "Closed";
+  return `<article class="tile ${dir} ${open?"open":""}">
+    <div class="hd"><div class="nm"><span class="code">${meta.code}</span><span class="full">${meta.mkt} · ${meta.full}</span></div>
+      <span class="pill">${status}</span></div>
+    <div class="px"><span class="val" data-v="${fmt(x.price)}" title="Click to copy">${fmt(x.price)}</span>
+      <span class="chg">${sign(chg)}${fmt(Math.abs(chg))}<span class="pct">${sign(pct)}${fmt(Math.abs(pct))}%</span></span></div>
+    <div>${chart(x)}<div class="axis"><span>${x.open?t12(x.open,true):""}</span><span>${open?"":"as of "+t12(x.time)}</span><span>${x.close?t12(x.close,true):""}</span></div></div>
+    <div class="meta"><span>Prev close<b>${fmt(x.prev)}</b></span><span>Day low<b>${fmt(x.low)}</b></span><span>Day high<b>${fmt(x.high)}</b></span></div>
+  </article>`;
+}
+
+function summary(rows){
+  const ok = rows.filter(r=>r.x && r.x.price!=null && !r.x.error).map(r=>({code:r.m.code, pct:(r.x.price-r.x.prev)/r.x.prev*100})).sort((a,b)=>b.pct-a.pct);
+  const max = Math.max(1, ...ok.map(r=>Math.abs(r.pct)));
+  return `<aside class="sum"><h2>Today's ranking</h2><div class="rank">${ok.map(r=>{
+    const w = Math.abs(r.pct)/max*50, c = r.pct>=0?"var(--up)":"var(--down)", left = r.pct>=0?50:50-w;
+    return `<div><span class="k">${r.code}</span><span class="bar"><i style="left:${left}%;width:${w}%;background:${c}"></i></span><span class="p ${r.pct>=0?"up-t":"down-t"}">${sign(r.pct)}${fmt(Math.abs(r.pct))}%</span></div>`;}).join("")}</div></aside>`;
+}
+
+let lastFetch = 0, busy = false;
+async function load(){
+  if (busy) return; busy = true;
+  const btn = document.getElementById("refresh"); btn.disabled = true; btn.querySelector("svg").classList.add("spin");
+  let data = null;
+  try { const r = await fetch("/api/indices", {cache:"no-store"}); if (r.ok) data = await r.json(); } catch(e){}
+  if (!data && window.__SNAPSHOT) data = window.__SNAPSHOT;
+  btn.disabled = false; btn.querySelector("svg").classList.remove("spin"); busy = false;
+  if (!data){ document.getElementById("age").textContent = "Couldn't reach the data feed. Retrying in a minute."; lastFetch = Date.now(); return; }
+  lastFetch = Date.now();
+  const by = Object.fromEntries((data.indices||[]).map(x=>[x.sym,x]));
+  const rows = INDICES.map(m=>({m, x:by[m.sym]}));
+  document.getElementById("grid").innerHTML = rows.map(r=>tile(r.m, r.x)).join("") + summary(rows);
+  const ok = rows.filter(r=>r.x && r.x.price!=null && !r.x.error);
+  const up = ok.filter(r=>r.x.price>r.x.prev).length, dn = ok.filter(r=>r.x.price<r.x.prev).length;
+  const openN = document.querySelectorAll(".tile.open").length;
+  document.getElementById("breadth").innerHTML = `<span><b class="up-t">${up}</b> up</span><span><b class="down-t">${dn}</b> down</span><span><b>${openN}</b> of 7 markets open now</span>`;
+  tick();
+}
+document.getElementById("grid").innerHTML = INDICES.map(()=>'<div class="skel"></div>').join("");
+document.getElementById("refresh").addEventListener("click", load);
+document.getElementById("grid").addEventListener("click", async e => {
+  const v = e.target.closest(".val"); if (!v) return;
+  try { await navigator.clipboard.writeText(v.dataset.v); v.classList.add("copied"); setTimeout(()=>v.classList.remove("copied"), 900); } catch(_){}
+});
+setInterval(tick, 1000); tick();
+load(); setInterval(()=>{ if (Date.now()-lastFetch >= 60e3) load(); }, 5e3);
+</script>
+</body>
+</html>
